@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(cd:*)",
+      "Bash(node backend/testConnection.js)",
+      "Bash(npm run:*)",
+      "Bash(nslookup:*)",
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:imgur.com)",
+      "Bash(node scripts/remove-bg.mjs)"
+    ]
+  }
+}

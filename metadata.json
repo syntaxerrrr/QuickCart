@@ -1,0 +1,5 @@
+{
+  "name": "QuickCart Grocery System",
+  "description": "A simple prototype for an online grocery ordering system with a customer cart and admin dashboard.",
+  "requestFramePermissions": []
+}
