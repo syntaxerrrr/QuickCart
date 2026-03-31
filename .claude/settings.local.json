@@ -9,7 +9,8 @@
       "Bash(npx tsc:*)",
       "WebFetch(domain:imgur.com)",
       "Bash(node scripts/remove-bg.mjs)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(find D:Leigithub_projQuickCart/src -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js \\\\\\))"
     ]
   }
 }

@@ -375,7 +375,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {item.name}
                         </span>
                         <div className="flex items-center gap-1 shrink-0">
-                          {order.status !== 'Completed' && order.status !== 'Cancelled' && !(order.processedBy && order.processedBy !== currentUser.name) ? (
+                          {order.status !== 'Completed' && order.status !== 'Cancelled' && order.status !== 'Ready to Pick Up' && !(order.processedBy && order.processedBy !== currentUser.name) ? (
                             <>
                               <button
                                 onClick={() => onUpdateOrderItem(order.id, item.id, item.quantity - 1)}
