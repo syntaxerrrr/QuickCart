@@ -1,4 +1,6 @@
-export type Role = 'admin' | 'user';
+export type Role = 'admin' | 'super_admin' | 'user';
+
+export const isAdminRole = (role: Role) => role === 'admin' || role === 'super_admin';
 
 export interface User {
   id: string;
@@ -39,4 +41,5 @@ export interface Order {
   totalPrice: number;
   status: OrderStatus;
   createdAt: string;
+  processedBy?: string;
 }

@@ -8,7 +8,8 @@
       "Bash(nslookup:*)",
       "Bash(npx tsc:*)",
       "WebFetch(domain:imgur.com)",
-      "Bash(node scripts/remove-bg.mjs)"
+      "Bash(node scripts/remove-bg.mjs)",
+      "Bash(curl:*)"
     ]
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GroceryItem, CartItem, Order, OrderStatus, Category, User, NotificationRecord } from './types';
+import { GroceryItem, CartItem, Order, OrderStatus, Category, User, NotificationRecord, isAdminRole } from './types';
 import logo from './image/logo.png';
 import { supabase } from './lib/supabase';
 import { GroceryList } from './components/GroceryList';
@@ -8,6 +8,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { GroceryMaintenance } from './components/GroceryMaintenance';
 import { CustomerManagement } from './components/CustomerManagement';
 import { CustomerOrders } from './components/CustomerOrders';
+import { AdminLogs } from './components/AdminLogs';
 import { Login } from './components/Login';
 import { ShoppingCart, LayoutDashboard, Store, CheckCircle2, PackageSearch, ClipboardList, Lock, LogOut, History, Bell, Filter, User as UserIcon, Users, Moon, Sun, AlertTriangle, Search, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -22,9 +23,9 @@ export default function App() {
 
   const savedUser = localStorage.getItem('currentUser');
   const [currentUser, setCurrentUser] = useState<User | null>(savedUser ? JSON.parse(savedUser) : null);
-  const [view, setView] = useState<'customer' | 'admin'>(savedUser && JSON.parse(savedUser).role === 'admin' ? 'admin' : 'customer');
+  const [view, setView] = useState<'customer' | 'admin'>(savedUser && isAdminRole(JSON.parse(savedUser).role) ? 'admin' : 'customer');
   const [customerSubView, setCustomerSubView] = useState<'shop' | 'orders'>('shop');
-  const [adminSubView, setAdminSubView] = useState<'orders' | 'maintenance' | 'customers'>('orders');
+  const [adminSubView, setAdminSubView] = useState<'orders' | 'maintenance' | 'customers' | 'logs'>('orders');
   const [groceryItems, setGroceryItems] = useState<GroceryItem[]>([]);
   const [itemsLoading, setItemsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
@@ -61,7 +62,7 @@ export default function App() {
     const { data, error } = await supabase
       .from('orders')
       .select(`
-        id, user_id, customer_name, total_price, status, created_at,
+        id, user_id, customer_name, total_price, status, created_at, processed_by,
         order_items ( id, grocery_item_id, item_name, item_category, item_price, quantity )
       `)
       .order('created_at', { ascending: false });
@@ -73,6 +74,7 @@ export default function App() {
         totalPrice: parseFloat(row.total_price),
         status: row.status as OrderStatus,
         createdAt: row.created_at,
+        processedBy: row.processed_by,
         items: (row.order_items ?? []).map((oi: any) => ({
           id: oi.grocery_item_id ?? oi.id,
           name: oi.item_name,
@@ -141,7 +143,7 @@ export default function App() {
 
     const prevIds = new Set(prevOrdersRef.current.map(o => o.id));
 
-    if (currentUser?.role === 'admin') {
+    if (currentUser && isAdminRole(currentUser.role)) {
       // Detect brand-new pending orders from any user
       const newPending = orders.filter(o => !prevIds.has(o.id) && o.status === 'Pending');
       if (newPending.length > 0) {
@@ -161,7 +163,7 @@ export default function App() {
       }
     }
 
-    if (currentUser?.role === 'user') {
+    if (currentUser && !isAdminRole(currentUser.role)) {
       // Detect status changes on the current user's orders
       const changedOrders: Order[] = [];
       orders.filter(o => o.userId === currentUser.id).forEach(order => {
@@ -225,8 +227,9 @@ export default function App() {
   const handleLogin = (user: User) => {
     localStorage.setItem('currentUser', JSON.stringify(user));
     setCurrentUser(user);
-    if (user.role === 'admin') {
+    if (isAdminRole(user.role)) {
       setView('admin');
+      if (user.role === 'admin') setAdminSubView('orders');
       // Notify admin of pending orders on login
       const pendingOrders = orders.filter(o => o.status === 'Pending');
       if (pendingOrders.length > 0) {
@@ -348,14 +351,27 @@ export default function App() {
   };
 
   const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
-    const { error } = await supabase.from('orders').update({ status }).eq('id', orderId);
+    let updates: any = { status };
+    if (status === 'On Process' && currentUser && isAdminRole(currentUser.role)) {
+      const order = orders.find(o => o.id === orderId);
+      if (order && !order.processedBy) {
+        updates.processed_by = currentUser.name;
+      }
+    }
+
+    const { error } = await supabase.from('orders').update(updates).eq('id', orderId);
     if (error) {
       console.error('Failed to update order status:', error.message);
       alert(`Error updating order status: ${error.message}\n(Did you run the 005_add_cancelled_status.sql migration?)`);
       return;
     }
     setOrders((prev) =>
-      prev.map((order) => (order.id === orderId ? { ...order, status } : order))
+      prev.map((order) => {
+        if (order.id === orderId) {
+          return { ...order, status, ...(updates.processed_by ? { processedBy: updates.processed_by } : {}) };
+        }
+        return order;
+      })
     );
   };
 
@@ -466,7 +482,7 @@ export default function App() {
 
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="hidden sm:flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
-              {currentUser.role === 'admin' ? (
+              {isAdminRole(currentUser.role) ? (
                 <div className="flex items-center gap-2 px-4 py-1.5 text-sm font-bold text-gray-900 dark:text-white">
                   <Lock size={16} className="text-gray-900 dark:text-white" />
                   Admin Portal
@@ -596,7 +612,7 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <AnimatePresence mode="wait">
-          {currentUser.role === 'user' && view === 'customer' ? (
+          {!isAdminRole(currentUser.role) && view === 'customer' ? (
             <motion.div
               key="customer"
               initial={{ opacity: 0, y: 10 }}
@@ -770,34 +786,46 @@ export default function App() {
               className="space-y-8"
             >
               <div className="flex flex-wrap gap-2 border-b border-gray-100 dark:border-gray-700 pb-4">
-                  <button
-                    onClick={() => setAdminSubView('orders')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'orders' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
-                      }`}
-                  >
-                    <ClipboardList size={18} />
-                    Orders
-                  </button>
-                  <button
-                    onClick={() => setAdminSubView('maintenance')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'maintenance' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
-                      }`}
-                  >
-                    <PackageSearch size={18} />
-                    Inventory
-                  </button>
+                <button
+                  onClick={() => setAdminSubView('orders')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'orders' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                >
+                  <ClipboardList size={18} />
+                  Orders
+                </button>
+                <button
+                  onClick={() => setAdminSubView('maintenance')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'maintenance' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
+                >
+                  <PackageSearch size={18} />
+                  Inventory
+                </button>
+                {currentUser?.role === 'super_admin' && (
                   <button
                     onClick={() => setAdminSubView('customers')}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'customers' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }`}
                   >
                     <Users size={18} />
-                    Customers
+                    Users
                   </button>
+                )}
+                {currentUser?.role === 'super_admin' && (
+                  <button
+                    onClick={() => setAdminSubView('logs')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'logs' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                  >
+                    <History size={18} />
+                    Logs
+                  </button>
+                )}
               </div>
 
               {adminSubView === 'orders' ? (
-                <AdminDashboard orders={orders} onUpdateStatus={updateOrderStatus} onUpdateOrderItem={updateOrderItemQuantity} onRemoveOrderItem={removeOrderItem} />
+                <AdminDashboard currentUser={currentUser} orders={orders} onUpdateStatus={updateOrderStatus} onUpdateOrderItem={updateOrderItemQuantity} onRemoveOrderItem={removeOrderItem} />
               ) : adminSubView === 'maintenance' ? (
                 <GroceryMaintenance
                   items={groceryItems}
@@ -806,8 +834,10 @@ export default function App() {
                   onUpdateItem={updateGroceryItem}
                   onDeleteItem={deleteGroceryItem}
                 />
-              ) : (
+              ) : adminSubView === 'customers' ? (
                 <CustomerManagement />
+              ) : (
+                <AdminLogs orders={orders} />
               )}
             </motion.div>
           )}
@@ -839,7 +869,7 @@ export default function App() {
 
       {/* Status Update Notification (Customer Only) */}
       <AnimatePresence>
-        {showNotification.show && currentUser?.role === 'user' && (
+        {showNotification.show && currentUser && !isAdminRole(currentUser.role) && (
           <motion.div
             key="status-notif"
             initial={{ opacity: 0, scale: 0.9, x: 100 }}
@@ -889,7 +919,7 @@ export default function App() {
 
       {/* Out of Stock Notification (Customer Only) */}
       <AnimatePresence>
-        {outOfStockNotification.show && currentUser?.role === 'user' && (
+        {outOfStockNotification.show && currentUser && !isAdminRole(currentUser.role) && (
           <motion.div
             key="outofstock-notif"
             initial={{ opacity: 0, scale: 0.9, x: 100 }}
@@ -941,7 +971,7 @@ export default function App() {
 
       {/* Admin New Order Notification (Admin Only) */}
       <AnimatePresence>
-        {adminNotification.show && currentUser?.role === 'admin' && (
+        {adminNotification.show && currentUser && isAdminRole(currentUser.role) && (
           <motion.div
             key="admin-notif"
             initial={{ opacity: 0, scale: 0.9, x: -100 }}

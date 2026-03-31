@@ -26,9 +26,24 @@ export const GroceryMaintenance: React.FC<GroceryMaintenanceProps> = ({
     category: 'Coffee',
     price: 0,
   });
+  const [nameError, setNameError] = useState('');
+
+  const isDuplicate = (name: string) =>
+    items.some(
+      (item) => item.name.trim().toLowerCase() === name.trim().toLowerCase() && item.id !== editingId
+    );
+
+  const handleNameChange = (name: string) => {
+    setFormData({ ...formData, name });
+    setNameError(isDuplicate(name) ? 'An item with this name already exists.' : '');
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isDuplicate(formData.name)) {
+      setNameError('An item with this name already exists.');
+      return;
+    }
     if (editingId) {
       onUpdateItem({ ...formData, id: editingId });
       setEditingId(null);
@@ -37,6 +52,7 @@ export const GroceryMaintenance: React.FC<GroceryMaintenanceProps> = ({
       setIsAdding(false);
     }
     setFormData({ name: '', category: 'Coffee', price: 0 });
+    setNameError('');
   };
 
   const startEdit = (item: GroceryItem) => {
@@ -49,6 +65,7 @@ export const GroceryMaintenance: React.FC<GroceryMaintenanceProps> = ({
     setIsAdding(false);
     setEditingId(null);
     setFormData({ name: '', category: 'Coffee', price: 0 });
+    setNameError('');
   };
 
   return (
@@ -76,10 +93,11 @@ export const GroceryMaintenance: React.FC<GroceryMaintenanceProps> = ({
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                onChange={(e) => handleNameChange(e.target.value)}
+                className={`w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 ${nameError ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 dark:border-gray-600 focus:ring-green-500'}`}
                 placeholder="e.g. Fresh Strawberries"
               />
+              {nameError && <p className="text-xs text-red-500 font-medium">{nameError}</p>}
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-400 uppercase">Category</label>
