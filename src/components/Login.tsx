@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { User } from '../types';
 import logo from '../image/logo.png';
-import { Lock, User as UserIcon, LogIn } from 'lucide-react';
+import { Lock, User as UserIcon, LogIn, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'motion/react';
 import { supabase } from '../lib/supabase';
 
@@ -12,6 +12,7 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,26 +37,26 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-start sm:items-center justify-center bg-[#F9FAFB] dark:bg-gray-900 px-4 py-8 overflow-y-auto">
+    <div className="min-h-[100dvh] flex items-start sm:items-center justify-center bg-[#F9FAFB] dark:bg-gray-900 px-4 py-6 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full"
       >
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700">
-          <div className="flex flex-col items-center mb-8">
-            <div className="mb-4">
+        <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700">
+          <div className="flex flex-col items-center mb-5 sm:mb-8">
+            <div className="mb-2 sm:mb-4">
               <img
                 src={logo}
                 alt="QuickCart Logo"
-                className="w-48 h-48 sm:w-80 sm:h-80 object-contain"
+                className="w-28 h-28 sm:w-64 sm:h-64 object-contain"
               />
             </div>
-            <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Welcome Back</h2>
-            <p className="text-gray-400 dark:text-gray-500 font-medium mt-2">Sign in to your QuickCart account</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Welcome Back</h2>
+            <p className="text-gray-400 dark:text-gray-500 font-medium mt-1 text-sm sm:text-base">Sign in to your QuickCart account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Username</label>
               <div className="relative">
@@ -83,16 +84,24 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <Lock size={20} />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     setError('');
                   }}
-                  className="w-full pl-14 pr-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border-2 border-transparent focus:border-green-600 focus:bg-white dark:focus:bg-gray-600 transition-all outline-none font-bold text-gray-900 dark:text-white"
+                  className="w-full pl-14 pr-14 py-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border-2 border-transparent focus:border-green-600 focus:bg-white dark:focus:bg-gray-600 transition-all outline-none font-bold text-gray-900 dark:text-white"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
             </div>
 
@@ -109,7 +118,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-green-600 transition-all shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-[0.98] cursor-pointer disabled:opacity-60"
+              className="w-full bg-gray-900 text-white py-4 sm:py-5 rounded-2xl font-black text-lg hover:bg-green-600 transition-all shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-[0.98] cursor-pointer disabled:opacity-60"
             >
               <LogIn size={22} />
               {loading ? 'Signing in...' : 'Sign In'}
