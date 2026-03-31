@@ -459,13 +459,13 @@ export default function App() {
             <img
               src={logo}
               alt="QuickCart Logo"
-              className="w-20 h-20 object-contain"
+              className="w-12 h-12 sm:w-20 sm:h-20 object-contain"
             />
-            <h1 className="text-xl font-black tracking-tight text-gray-900 dark:text-white">QuickCart</h1>
+            <h1 className="text-lg sm:text-xl font-black tracking-tight text-gray-900 dark:text-white">QuickCart</h1>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden sm:flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
               {currentUser.role === 'admin' ? (
                 <div className="flex items-center gap-2 px-4 py-1.5 text-sm font-bold text-gray-900 dark:text-white">
                   <Lock size={16} className="text-gray-900 dark:text-white" />
@@ -479,11 +479,11 @@ export default function App() {
               )}
             </div>
 
-            <div className="h-8 w-px bg-gray-100" />
+            <div className="hidden sm:block h-8 w-px bg-gray-100" />
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center text-white">
+                <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center text-white shrink-0">
                   <UserIcon size={16} />
                 </div>
                 <div className="hidden sm:block">
@@ -517,7 +517,7 @@ export default function App() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-12 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[200] overflow-hidden"
+                      className="absolute right-0 top-12 w-80 max-w-[calc(100vw-1rem)] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[200] overflow-hidden"
                     >
                       {/* Panel header */}
                       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
@@ -604,10 +604,10 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-8"
             >
-              <div className="flex gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
+              <div className="flex flex-wrap gap-2 sm:gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
                 <button
                   onClick={() => setCustomerSubView('shop')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${customerSubView === 'shop' ? 'bg-green-600 text-white shadow-lg shadow-green-100' : 'text-gray-500 hover:bg-gray-50'
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${customerSubView === 'shop' ? 'bg-green-600 text-white shadow-lg shadow-green-100' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                 >
                   <Store size={18} />
@@ -615,11 +615,11 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setCustomerSubView('orders')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${customerSubView === 'orders' ? 'bg-green-600 text-white shadow-lg shadow-green-100' : 'text-gray-500 hover:bg-gray-50'
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${customerSubView === 'orders' ? 'bg-green-600 text-white shadow-lg shadow-green-100' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                 >
                   <History size={18} />
-                  Track My Orders
+                  My Orders
                 </button>
               </div>
 
@@ -769,11 +769,10 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-8"
             >
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
-                <div className="flex gap-4">
+              <div className="flex flex-wrap gap-2 border-b border-gray-100 dark:border-gray-700 pb-4">
                   <button
                     onClick={() => setAdminSubView('orders')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'orders' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'orders' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }`}
                   >
                     <ClipboardList size={18} />
@@ -781,7 +780,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setAdminSubView('maintenance')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'maintenance' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'maintenance' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }`}
                   >
                     <PackageSearch size={18} />
@@ -789,13 +788,12 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setAdminSubView('customers')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'customers' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${adminSubView === 'customers' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }`}
                   >
                     <Users size={18} />
                     Customers
                   </button>
-                </div>
               </div>
 
               {adminSubView === 'orders' ? (
@@ -824,7 +822,7 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-fit"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-fit max-w-[calc(100vw-2rem)]"
           >
             <div className="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-gray-800">
               <div className="bg-green-500 rounded-full p-1">
@@ -847,7 +845,7 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9, x: 100 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.9, x: 100 }}
-            className="fixed top-20 right-8 z-[100] w-fit"
+            className="fixed top-20 right-4 sm:right-8 z-[100] w-fit max-w-[calc(100vw-2rem)]"
           >
             {(() => {
               const status = showNotification.status;
@@ -897,9 +895,9 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9, x: 100 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.9, x: 100 }}
-            className="fixed top-36 right-8 z-[100] w-fit"
+            className="fixed top-36 right-4 sm:right-8 z-[100] w-fit max-w-[calc(100vw-2rem)]"
           >
-            <div className="bg-white text-gray-900 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-red-100 max-w-xs">
+            <div className="bg-white text-gray-900 px-4 sm:px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-red-100 max-w-xs">
               <div className="rounded-full p-2 bg-red-100 text-red-500 shrink-0">
                 <AlertTriangle size={20} />
               </div>
@@ -949,9 +947,9 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9, x: -100 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.9, x: -100 }}
-            className="fixed top-20 left-8 z-[100] w-fit"
+            className="fixed top-20 left-4 sm:left-8 z-[100] w-fit max-w-[calc(100vw-2rem)]"
           >
-            <div className="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-gray-800">
+            <div className="bg-gray-900 text-white px-4 sm:px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-gray-800">
               <div className="bg-blue-500 rounded-full p-2 text-white animate-pulse">
                 <ClipboardList size={20} />
               </div>

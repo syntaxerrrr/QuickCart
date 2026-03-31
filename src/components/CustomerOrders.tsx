@@ -45,12 +45,12 @@ export const CustomerOrders: React.FC<CustomerOrdersProps> = ({ orders }) => {
                 />
               </div>
 
-              <div className="flex justify-between items-start mb-6 mt-2">
-                <div>
+              <div className="flex flex-wrap justify-between items-start gap-2 mb-6 mt-2">
+                <div className="min-w-0">
                   <p className="text-xs font-mono font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Order #{order.id.slice(-6)}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">{new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</p>
                 </div>
-                <div className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${config.color}`}>
+                <div className={`shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${config.color}`}>
                   <StatusIcon size={14} />
                   {config.label}
                 </div>

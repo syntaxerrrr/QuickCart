@@ -64,7 +64,7 @@ const CustomDatePicker = ({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-2 right-0 z-50 bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-gray-700 p-4 w-72 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full mt-2 right-0 z-50 bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-gray-700 p-4 w-72 max-w-[calc(100vw-2rem)] animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-bold text-gray-900 dark:text-white text-sm whitespace-nowrap">
               {viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
@@ -452,23 +452,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 key={order.id}
                 className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm"
               >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-mono font-bold text-gray-400 dark:text-gray-500">
-                        #{order.id.slice(-6)}
-                      </span>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-md">
-                        {order.customerName}
-                      </span>
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 ${statusConfig[order.status].color}`}
-                      >
-                        <Config size={12} />
-                        {order.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                <div className="flex flex-col gap-4 mb-6">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-mono font-bold text-gray-400 dark:text-gray-500">
+                      #{order.id.slice(-6)}
+                    </span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-md">
+                      {order.customerName}
+                    </span>
+                    <span
+                      className={`text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 ${statusConfig[order.status].color}`}
+                    >
+                      <Config size={12} />
+                      {order.status}
+                    </span>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 w-full sm:w-auto">
                       {new Date(order.createdAt).toLocaleString()}
                     </p>
                   </div>

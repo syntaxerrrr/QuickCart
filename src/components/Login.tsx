@@ -36,7 +36,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB] dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-start sm:items-center justify-center bg-[#F9FAFB] dark:bg-gray-900 px-4 py-8 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -48,7 +48,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <img
                 src={logo}
                 alt="QuickCart Logo"
-                className="w-80 h-80 object-contain"
+                className="w-48 h-48 sm:w-80 sm:h-80 object-contain"
               />
             </div>
             <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Welcome Back</h2>
